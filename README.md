@@ -19,3 +19,9 @@ qt_sass_theme
 pyqt_hidable_menubar
 pyqt_instant_search_bar
 ```
+
+### Packed Source on PanBaidu:
+
+url: https://pan.baidu.com/s/1GhbCVQYr97zIpxc27Hdnvg
+
+key: kfma
