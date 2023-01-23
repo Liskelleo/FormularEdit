@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="shortcut icon" href="./ico/bitbug_favicon.ico" type="image/x-icon" >
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #logo {
+            font-family: 'Malgun Gothic', monospace;
+            font-weight: 200;
+        }
+        #txtbtn {
+            position: absolute;
+            display: flex;
+            margin: -175px 200px;/*-200px 200px*/
+            background-color: #286090;
+            color: #ffffff;
+            font: 15px 'Consolas';
+        }
+        #txtbtn2 {
+            background-color: #286090;
+            color: #ffffff;
+        }
+        #myModal {
+            box-shadow: 0 0 25px rgba(0,0,0,.25);
+        }
+        #container {
+            text-align: left;
+            font-family: Consolas, monospace;
+            margin: auto;
+            background-color: white;
+        }
+        #infobar {
+            font-family: Consolas, monospace;
+            position: fixed;
+            bottom: 10px; right: 15px;
+            text-align: right;
+            z-index: 1;
+        }
+        #infobar>p {
+            margin: 0;
+        }
+        /*#id_footer {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content:flex-end;
+            flex-grow: 1;
+            font: "Microsoft YaHei UI";
+            line-height:2em;
+            bottom: 0;
+        }*/
+        #infoswitch {
+            float: right;
+            background-color: transparent;
+            border: 0; padding: 10px;
+        }
+        #go-to-top {
+            display: flex;
+        }
+    </style>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script>
+        $(function() {
+            function getprogress() {
+                window.reading_prog=($(window).height()+$(window).scrollTop())*100/$(document).height();
+                $('#progressbar').text(Math.floor(reading_prog)+'%');
+            }
+            getprogress();
+            setInterval(getprogress,0);
+        });
+        function infoswitch() {
+            $('#infobar>p').fadeToggle(200);
+        }
+    </script>
+  </head>
+  
+  <body>
+    <div id="infobar">
+        <p><span id="progressbar"></span></p>
+        <button type="button" id="infoswitch" onclick="infoswitch()"><span class="caret"></span></button>
+    </div>
+
+    <link rel="stylesheet" href="./css/editormd.preview.css" />
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <div id="test-markdown-view">
+        <h1>
+            <p>
+                <img style="float:left;margin-top:-20px" src="./ico/FormularEdit.png"/>
+                <span>
+                    A CONCISE Manual of FormularEdit
+                </br>
+                <span style="display:inline-block;font-weight:lighter;color:#666;font-size:14px;font:Ricardo Extra Light">
+                    Initial Release: 2022.12.25.<br>
+                    Update: 2023.1.13.<br>
+                    Edited by <a href="https://github.com/Liskelleo">Liskelleo</a>.
+                </span>
+        </h1>
+
+    <textarea id="txt" display:none> **Table of Contents**
+
+[TOC]
+
+##Preface
+This software is developed by PyQt5 graphical interface development libraries on Win10 OS:
+```cmd
+PyQt5                                   5.15.4
+pyqt5-plugins                           5.15.4.2.2
+PyQt5-Qt5                               5.15.2
+PyQt5-sip                               12.11.0
+pyqt5-tools                             5.15.4.3.2
+PyQtWebEngine                           5.15.6
+PyQtWebEngine-Qt5                       5.15.2
+```
+Any questions or advice, please email at: <url>liskello_o@outlook.com</url>.
+
+##Module Purpose
+The formula/expression will be executable on Python on the one hand and converted to LaTeX code for presentation on the other hand.
+
+##Editing rules
+####1 One Pact
+#####The new variable should be on the left side of the equation
+
+####2 Some tips for users to input
+#####2.1 General Operation
+| Symbols | Description |
+| ------------- | ------------- |
+| `+-*/ ` | add, subtract, multiply and divide |
+| `x//y` | exact division |
+| `x**2` | power, do not use this notation to discribe a superscript |
+| `2e3` | scientific counting method, `2.e3` is not recommended |
+
+#####2.2 Special Symbols
+| Symbols | Description | Example |
+| ------------- | ------------- | ------------- |
+| `[]` | free subscript, commonly used in the subscript of Greek letters, and cannot be used for variable name | `alpha[mn]`: αₘₙ |
+| `_` | restricted subscript, globally supplied, only one character after this symbol is allowed to escape\* | `x_0`: x₀ |
+\* Free subscript mode under the input of notation "\_" is supported, turn to MenuBar to turn it on.
+
+#####2.3 General functions (trigonometric functions, inverse trigonometric functions, logarithmic function, hyperbolic functions, etc.)
+| Function name | Description |
+| ------------- | ------------- |
+| `fabs()/abs()` | absolute value calculations |
+| `sqrt()` | square root calculations |
+| `ln()/log2()/log10()` | basic logarithmic calculations\* |
+\*There is no current support for logarithmic functions of any base.
+
+#####2.4 Special Functions
+| Function name | Description |
+| ------------- | ------------- |
+| ` floor()/ceil()` | round up/down |
+| `factorial()` | factorial arithmetics |
+| `max(x₁, x₂, x₃,...) /min(x₁, x₂, x₃,...)` | the max/min function |
+| `degree()/angle()`  | degree measurement\* |
+\*The default rule of angle input is `degree()` for inputing radians and `angle()` for inputing angles.
+
+#####2.5 Other Functions
+######2.5.1 Functions that can be shown in form of formulas
+| Function name | Description | Note |
+| ------------- | ------------- | ------------- |
+| `prod()` | the quadrature function | need to import ***math***  library when FormularEdit is used as a plugin |
+| `sum()` | the sum function | a simple example: `sqrt(sum(x**2 for x in coordinates))` |
+\*Integration (integral operation) or derivation (derivative operation) are not supported currently.
+
+######2.5.2 Functions that cannot be shown in form of formulas (partial)
+| Function name | Description |
+| ------------- | ------------- |
+| `exp()` | the natural exponential function |
+| `log(x[, base])` | logarithm function of any base, need to use ***math***  import when FormularEdit is used as a plugin\* |
+| `gcd(x₁, x₂)` | maximum common divisor calculations |
+| `lcm(x₁, x₂)` | minimum common multiple calculations |
+| `fmod(x, y)` |  remainder of x over y |
+\*Fuctions in library ***numpy*** can only takes arguments of ArrayType, import with ***math*** can aviod this problem.
+
+######2.5.3 Another description when used as a plugin
+The rest of the ***math*** and ***numpy*** libraries have scientific computation functions, which are common to both libraries:
+['ceil', 'copysign', 'cos', 'cosh', 'degrees', 'e', 'exp', 'expm1', 'fabs', 'floor', 'fmod', 'frexp', 'gcd', 'hypot',  'inf', 'isclose', 'isfinite', 'isinf', 'isnan', 'lcm', 'ldexp', 'log', 'log10', 'log1p', 'log2', 'modf', 'nan',  'nextafter', 'pi', 'prod', 'radians', 'remainder', 'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'trunc']
+
+####3 Links of libs
+#####3.1 latexify
+The latexify-py 0.2.0 library is used for conversion from formulas(specifically, Python Syntax) to LaTeX code.
+More formulas and functions to explore on <url>https://pypi.org/project/latexify-py/docs/index.md</url>.
+#####3.2 math
+More functions to explore on <url>https://docs.python.org/3/library/math.html</url>.
+#####3.3 numpy
+More functions to explore on <url>https://numpy.org/doc/stable</url>.
+
+####4 Features
+#####4.1 To save, manage, and clear historical records
+#####4.2 To save formula screenshot with keyboard shortcuts
+#####4.3 To feel free to switch between different themes of the interface
+#####4.4 Easy query and insertion of items in MenuBar
+#####4.5 Easy Interchange of special formats in MenuBar
+######4.5.1 Free subscript
+Multiple subscripts can be represented by entering multiple "\_" tags.
+######4.5.2 Special superscript
+Currently only certain superscripts for SINGLE letters are supported, including "\_bar", "\_dot", "\_hat", and "\_tilde".
+######4.5.3 ldentify physical constants
+By marking the symbols of physical constants in the toolbar with rounded brackets, this function can be used to identify and automatically convert the corresponding values in the calculation.
+#####4.6 To access calculation as a plugin
+An important example: *plugin.py*
+```python
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+# QtWebEngineWidgets must be imported or Qt.AA_ShareOpenGLContexts
+# must be set before a QCoreApplication instance is created
+
+class Ui_mainWindow(object):
+
+    def setupUi(self,mainWindow):
+        mainWindow.setObjectName("mainWindow")
+        mainWindow.resize(400,100)
+        self.centralwidget = QtWidgets.QWidget(mainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        mainWindow.setCentralWidget(self.centralwidget)
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.setCentralWidget(self.pushButton)
+        self.retranslateUi(mainWindow)
+        QtCore.QMetaObject.connectSlotsByName(mainWindow)
+
+    def retranslateUi(self, mainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        mainWindow.setWindowTitle(_translate("mainWindow", "Plugin"))
+        self.pushButton.setText(_translate("MainWindow", "Open FormularEdit"))
+
+        
+class MainWin(QtWidgets.QMainWindow,Ui_mainWindow):
+    
+    def __init__(self):
+        super(MainWin,self).__init__()
+        self.setupUi(self)
+        self.pushButton.clicked.connect(self.select_act)
+
+    def select_act(self):
+        from setup import MainDialogImgBW
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint & ~QtCore.Qt.WindowMaximizeButtonHint)
+        self.setEnabled(False)
+        self.show()
+        self.demo = MainDialogImgBW()
+        self.demo.show()
+        self.demo.shutdownValue.connect(self.getValue)
+
+    def getValue(self, tuple):
+        head, tail = tuple
+        if tail:
+            if head:
+                if head[1]:
+                    print(head[0], head[1])
+                else:
+                    self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMaximizeButtonHint)
+                    self.setEnabled(True)
+                    self.show()
+            else:
+                print('None')
+            self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMaximizeButtonHint)
+            self.setEnabled(True)
+            self.show()
+        else:
+            if head:
+                print(head[0], head[1])
+            else:
+                print('None')
+
+        
+if __name__ == "__main__":
+    import sys
+    sys.path.append(r"F:\FormularEdit") #change the path into yours
+    app = QtWidgets.QApplication(sys.argv)
+    main = MainWin()
+    main.show()
+    sys.exit(app.exec_())
+```
+Another example: See [*PhyExpAssistant*]().
+####5 Access to MD>>> browse src
+    </textarea>
+    </div>
+    <hr>
+        <footer id="id_footer">
+            <h3>
+                <img src="./ico/bitbug_favicon.png">
+                <span id="logo">FormularEdit</span>
+            </h3>
+            <a href="#top" id="go-to-top" style="display:block">⇧ go back to the top ⇧</a>
+            <p style="font-weight:200">Copyright © 2022-2023 FormularEdit, MIT License.</p>
+            <p style="font-weight:200">WebDesign &amp; SoftwareDevelop by Liskelleo.</p>
+        </footer>
+
+    <button type="button" id="txtbtn" class="btn btn-default btn-sm" data-toggle="modal" data-target="#myModal">
+        <span id="prog">Browse SRC</span>
+    </button>
+
+    <div class="modal fade" id="myModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <h4 class="modal-title">
+                Document.md
+            </h4>
+        </div>
+        <div class="modal-body">
+            <div id="container"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" id="txtbtn2" class="btn btn-primary" onclick="copyToClipboard(s)">Copy</button>
+          </div> 
+        
+        <script>
+            function copyToClipboard(s) {
+                if (window.clipboardData) {
+                    window.clipboardData.setData('text', s);
+                } else {
+                    (function(s) {
+                        document.oncopy = function(e) {
+                            e.clipboardData.setData('text', s);
+                            e.preventDefault();
+                            document.oncopy = null;
+                        }
+                    })(s);
+                    document.execCommand('Copy');
+                }
+            $('#myModal').modal('hide');
+            alert("The contents have been copied to the clipboard!");
+            }
+        </script>
+      </div>
+    <script src="./js/editormd.js"></script>
+    <script src="./js/marked.min.js"></script>
+    <script src="./js/prettify.min.js"></script>
+    <script type="text/javascript">
+        var s = '#A CONCISE Manual of FormularEdit\n'+document.getElementById('txt').value;
+        $(function() {
+            var lines = s.split('\n');
+            container = document.getElementById('container');
+            testView = editormd.markdownToHTML("test-markdown-view", {htmlDecode : true});
+            for(var pos=0;pos<lines.length;pos++) {
+                var elem=document.createElement('p');
+                elem.textContent=lines[pos];
+                container.appendChild(elem);
+            }
+        });
+    </script>
+  </body>
+</html>
