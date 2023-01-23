@@ -22,6 +22,6 @@ pyqt_instant_search_bar
 
 ### Packed Source on PanBaidu:
 
-url: https://pan.baidu.com/s/1GhbCVQYr97zIpxc27Hdnvg
+url: https://pan.baidu.com/s/1g7giPjlMIgHcuYsfVHCDow
 
-key: kfma
+key: m89e
