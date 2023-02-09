@@ -1,16 +1,15 @@
+content = "def functionName():return formular_to_be_replaced"
 #-*- coding: utf-8                  -*-
 #-*- author: liskelleo              -*-
-#-*- update: 2023.1.23              -*-
+#-*- update: 2023.2.8               -*-
 #-*- email:  liskello_o@outlook.com -*-
 
 
-import datetime
 import os, re, sys, json
-import subprocess, traceback
+import latexify, traceback, datetime
 
 from PyQt5.QtGui import QPixmap, QIcon, QFont
-from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QThread, QThreadPool, \
-     QRunnable, QEvent, QSize
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QThread, QEvent, QSize
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMenu, QMenuBar, QTextEdit, \
      QGridLayout, QAction, QStatusBar, QWidgetAction, QMessageBox, QTreeWidgetItem, \
      QLabel, QSlider, QPushButton, QLineEdit, QHBoxLayout, QWidget, QActionGroup
@@ -55,7 +54,7 @@ import matplotlib.pyplot as plt
 
 text_kwargs = 50
 last_speres, vflag = None, None
-sflag, cflag, cflag2, fflag = False, False, False, False
+sflag, cflag, cflag2, fflag, rflag = False, False, False, False, False
 
 
 class MainDegbug(QMainWindow):
@@ -64,6 +63,7 @@ class MainDegbug(QMainWindow):
         self.ui()
 
     def ui(self):
+        global error
         self.setWindowTitle('出现错误')
         self.setFixedSize(self.width(),self.height())
         self.setWindowIcon(QIcon('./icon/debug.svg'))
@@ -79,7 +79,7 @@ class MainDegbug(QMainWindow):
         label2.setScaledContents(True)
         label2.move(25,23)
         textedit = QTextEdit(self)
-        with open('./output/error.log','r',encoding='utf-8') as readError:
+        with open('./output/error.log','r') as readError:
             error = readError.read()
         textedit.setPlainText(error)
         textedit.setReadOnly(True)
@@ -94,7 +94,7 @@ class MainDegbug(QMainWindow):
         button.move(315,428)
         button.show()
         button.pressed.connect(self.sendmail)
-    
+        
     def sendmail(self):
         import webbrowser
         webbrowser.open('https://github.com/liskelleo/FormularEdit/issues/new')
@@ -120,32 +120,13 @@ class createFormula_Thread(QThread):
             self.F.axes.text(0.5,0.5,'${}$'.format(self.speres),ha='center',va='center',fontsize=text_kwargs)
             self.F.draw()
         except:
-            self.F.axes.cla()
+            #self.F.axes.cla()
             pass
         
     def __del__(self):
         self.quit()
         self.requestInterruption()
         self.wait()
-
-
-class WorkerSignals(QObject):
-    result = pyqtSignal(str)
-    finished = pyqtSignal()
-
-
-class SubProcessWorker(QRunnable):
-
-    def __init__(self, command):
-        super().__init__()
-        self.signals = WorkerSignals()
-        self.command = command
-
-    @pyqtSlot()
-    def run(self):
-        output = subprocess.getoutput(self.command)
-        self.signals.result.emit(output)
-        self.signals.finished.emit()
 
 
 class MyFigure(FigureCanvas):
@@ -260,8 +241,6 @@ class MainDialogImgBW(QMainWindow, Ui_FormularEdit):
         self.gridlayout.addWidget(self.F,0,1)
 
         self.F.changeValue.connect(self.result)
-        
-        self.threadpool = QThreadPool()
 
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
@@ -475,21 +454,32 @@ class MainDialogImgBW(QMainWindow, Ui_FormularEdit):
         t = QtSassTheme()
         t.getThemeFiles(theme='light_gray', font_size=10)
         t.setThemeFiles(main_window=self)
+        self.sbm.searchBar.__setStyle1()
 
     def __themeToggled1(self):
         t = QtSassTheme()
         t.getThemeFiles(theme='dark_gray', font_size=10)
         t.setThemeFiles(main_window=self)
+        self.sbm.searchBar.__setStyle2()
     
     def __themeToggled2(self):
         t = QtSassTheme()
         t.getThemeFiles(theme='dark_blue', font_size=10)
         t.setThemeFiles(main_window=self)
+        self.sbm.searchBar.__setStyle2()
     
     def __themeToggled3(self):
         t = QtSassTheme()
         t.getThemeFiles(theme='light_blue', font_size=10)
         t.setThemeFiles(main_window=self)
+        self.sbm.searchBar.__setStyle1()
+
+    @staticmethod
+    def is_Chinese(word):
+        for ch in word:
+            if '\u4e00' <= ch <= '\u9fff':
+                return True
+        return False
     
     @staticmethod
     def check(key):
@@ -639,89 +629,69 @@ class MainDialogImgBW(QMainWindow, Ui_FormularEdit):
 
     @pyqtSlot()
     def on_textEdit_textChanged(self):
-        global last_formular
+        global content, last_speres, rflag
         formular = self.textEdit.toPlainText()
-        if len(formular) <= 150:
+        formular = self.check2(formular)
+        if len(formular) <= 300:
             self.__charsLinesCountLabel.setText(self.__charsLinesCountText.format(len(formular)))
-            formular = self.check2(formular)
-            with open('./background.py','r') as f_read:
-                content = f_read.read()
-            if '=' not in formular:
-                content = content.replace('formular_to_be_replaced', formular)
-                content = content.replace('delete_functionName_and_eq',
-                "formular = formular.replace('\\mathrm{functionName}() =','')")
-                content = content.replace('delete_bracket',"")
-            else:
-                content = content.replace('delete_functionName_and_eq',"")
-                formular_name = formular.split('=')[0]
-                formular_content = formular.split('=')[1]
-                if '(' not in formular_name:
-                    content = content.replace('functionName',formular_name)
-                    content = content.replace('formular_to_be_replaced',formular_content)
-                    content = content.replace('delete_bracket',
-                    "formular = formular.replace('()','')")
+            try:
+                if '=' not in formular:
+                    content_1 = content.replace('formular_to_be_replaced', formular)
+                    k = latexify.get_latex(content_1)
+                    k = k.replace('\\mathrm{functionName}() =','')
                 else:
-                    formular_name_wo_bracket = formular_name.split('(')[0]
-                    content = content.replace('functionName()',formular_name)
-                    content = content.replace('functionName',formular_name_wo_bracket)
-                    content = content.replace('formular_to_be_replaced',formular_content)
-                    content = content.replace('delete_bracket',
-                    "formular = formular.replace('()','')")
-            with open('run_cache','w') as f_write:
+                    formular_name = formular.split('=')[0]
+                    formular_content = formular.split('=')[1]
+                    if '(' not in formular_name:
+                        content_1 = content.replace('functionName',formular_name)
+                    else:
+                        content_1 = content.replace('functionName()',formular_name)
+                    content_2 = content_1.replace('formular_to_be_replaced',formular_content)
+                    k = latexify.get_latex(content_2)
+                    if '(' not in formular_name:
+                        k = k.replace('() =','=')
+                if self.is_Chinese(k):
+                    self.statusBar.showMessage(u'输入了中文字符!', 1000)
+                    self.F.axes.cla()
+                else:
+                    speres, rflag = k, True
+                    last_speres = speres
+                    self.xxx = createFormula_Thread()
+                    self.xxx.setCmd(speres, self.F)
+                    self.xxx.start()
+            except Exception as signal:
+                signal, rflag = str(signal), False
                 try:
-                    f_write.write(content)
+                    if 'NoneType' in signal:
+                        self.statusBar.showMessage(u'输入为空!', 1000)
+                        self.F.axes.cla()
+                        self.F.draw()
+                        last_speres = None
+                    elif 'invalid character' in signal:
+                        self.statusBar.showMessage(u'输入了非法字符!', 1000)
+                        self.F.axes.cla()
+                        self.F.draw()
+                    elif 'invalid syntax' in signal:
+                        self.statusBar.showMessage(u'用法错误!', 1000)
+                        self.F.axes.cla()
+                        self.F.draw()
+                    else:
+                        self.statusBar.showMessage(u'发生错误!', 1000)
+                        self.F.axes.cla()
+                        self.F.draw()
                 except:
-                    self.statusBar.showMessage(u'输入非法字符!', 1000)
-            self.runner = SubProcessWorker("python run_cache")
-            self.runner.signals.result.connect(self.result)
-            self.threadpool.start(self.runner)
+                    pass
         else:
-            self.statusBar.showMessage(u'超出了字数限制150!', 1000)
+            self.statusBar.showMessage(u'超出了字数限制300!', 1000)
 
-    def result(self, signal):
+    def result(self, s):
         global last_speres, text_kwargs
-        if self.sender() is self.F and last_speres is not None:
+        if last_speres is not None:
             self.statusBar.showMessage(u'当前缩放比例:{}%'.format(text_kwargs+50), 500)
             speres = last_speres
             self.xxx = createFormula_Thread()
             self.xxx.setCmd(speres, self.F)
             self.xxx.start()
-        else:
-            try:
-                if 'Error' not in signal:
-                    if 'SyntaxWarning' in signal:
-                        self.statusBar.showMessage(u'下标用法错误!', 1000)
-                        self.F.axes.cla()
-                        self.F.draw()
-                    else:
-                        speres = signal
-                        last_speres = speres
-                        self.xxx = createFormula_Thread()
-                        self.xxx.setCmd(speres, self.F)
-                        self.xxx.start()
-                elif 'NoneType' in signal:
-                    self.statusBar.showMessage(u'输入为空!', 1000)
-                    self.F.axes.cla()
-                    self.F.draw()
-                    last_speres = None
-                elif 'Non-UTF-8' in signal:
-                    self.statusBar.showMessage(u'输入了非法字符!', 1000)
-                    self.F.axes.cla()
-                    self.F.draw()
-                elif "SyntaxError" in signal:
-                    if 'unmatched' in signal:
-                        self.statusBar.showMessage(u'请补全括号!', 1000)
-                        self.F.axes.cla()
-                        self.F.draw()
-                        last_speres = None
-                    elif 'invalid syntax' in signal:
-                        self.statusBar.showMessage(u'用法错误!', 1000)
-                        self.F.axes.cla()
-                        self.F.draw()
-            except:
-                self.F.axes.cla()
-                self.F.draw()
-                pass
 
     def __zoomByWheel(self, n):
         self.__zoomScaleLabel.setText(self.__zoomScaleText.format(n))
@@ -759,47 +729,35 @@ class MainDialogImgBW(QMainWindow, Ui_FormularEdit):
             self.statusBar.showMessage(u'已清空历史记录!', 1000)
     
     def save_history(self):
-        global sflag, fflag
+        global sflag, fflag, rflag, Funcname, funcname, last_formular
         reply = QMessageBox.question(self,"提示","是否保存到历史记录?",QMessageBox.Yes,QMessageBox.No)
         if reply == QMessageBox.Yes:
-            close_flag = True
-            cmd = os.popen('python run_cache')
-            flag_str = cmd.read().rstrip()
-            flag = bool(flag_str)
-            cmd.close()
-            try:
-                with open('run_cache','r') as wp:
-                    reslst = wp.readlines()
-                funcname = reslst[4]
-                last_formular = reslst[5].split()[1]
-            except FileNotFoundError:
-                close_flag = False
-                last_formular = None
-            except IndexError:
-                last_formular = None
-            if last_formular is None:
+            formula = self.textEdit.toPlainText()
+            if formula == '':nflag = False
+            else:nflag = True
+            if '=' not in formula:Funcname, eflag = '', False
+            else:Funcname, last_formular, eflag = formula.split('=')+[True]
+            if ')' in Funcname:funcname = Funcname.split('(')[0]
+            else:funcname = Funcname
+            if not nflag:
                 QMessageBox.warning(self,"警告","输入为空!",QMessageBox.Yes)
-            elif not flag:
+            elif not rflag:
                 QMessageBox.warning(self,"警告","存在错误, 请检查输入的表达式!",QMessageBox.Yes)
+            elif not eflag:
+                QMessageBox.warning(self,"警告","请输入含有新变量的表达式!",QMessageBox.Yes)
             else:
-                if 'functionName' not in funcname:
-                    funcname = funcname[4:]
-                    funcname = funcname.split('(')[0]
-                    with open(r"./output/data.json", "w") as f:
-                        fml = '{}={}'.format(funcname, last_formular)
-                        self.sbm.addAction(fml)
-                        self.todo.append([False, fml])
-                        data = json.dump(self.todo, f)
-                    if fflag:
-                        emitformula = self.formula_filter(self.check3(last_formular,'max','min','sum','prod'))
-                    else:
-                        emitformula = self.check3(last_formular,'max','min','sum','prod')
-                    self.shutdownValue.emit(((funcname, emitformula), 0))
-                    if close_flag:os.remove('run_cache')
-                    sflag = True
-                    self.setWindowTitle("公式编辑器")
+                with open(r"./output/data.json", "w") as f:
+                    fml = '{}={}'.format(Funcname, last_formular)
+                    self.sbm.addAction(fml)
+                    self.todo.append([False, fml])
+                    data = json.dump(self.todo, f)
+                if fflag:
+                    emitformula = self.formula_filter(self.check3(last_formular,'max','min','sum','prod'))
                 else:
-                    QMessageBox.warning(self,"警告","请输入含有新变量的表达式!",QMessageBox.Yes)
+                    emitformula = self.check3(last_formular,'max','min','sum','prod')
+                self.shutdownValue.emit(((funcname, emitformula), 0))
+                sflag = True
+                self.setWindowTitle("公式编辑器")
         else:
             self.shutdownValue.emit((False, 0))
     
@@ -809,50 +767,38 @@ class MainDialogImgBW(QMainWindow, Ui_FormularEdit):
         self.statusBar.showMessage(u'图片已保存到剪贴板!', 1000)
 
     def closeEvent(self, event):
-        global sflag, fflag
+        global sflag, fflag, rflag, Funcname, funcname, last_formular
         if not sflag:
-            close_flag = True
-            cmd = os.popen('python run_cache')
-            flag_str = cmd.read().rstrip()
-            flag = bool(flag_str)
-            cmd.close()
-            try:
-                with open('run_cache','r') as wp:
-                    reslst = wp.readlines()
-                funcname = reslst[4]
-                last_formular = reslst[5].split()[1]
-            except FileNotFoundError:
-                close_flag = False
-                last_formular = None
-            except IndexError:
-                last_formular = None
+            formula = self.textEdit.toPlainText()
+            if formula == '':nflag = False
+            else:nflag = True
+            if '=' not in formula:Funcname, eflag = '', False
+            else:Funcname, last_formular, eflag = formula.split('=')+[True]
+            if ')' in Funcname:funcname = Funcname.split('(')[0]
+            else:funcname = Funcname
             reply = QMessageBox.question(self,"提示","是否保存本次编辑?",QMessageBox.Yes,QMessageBox.No)
             if reply == QMessageBox.Yes:
-                if last_formular is None:
+                if not nflag:
                     QMessageBox.warning(self,"警告","输入为空!",QMessageBox.Yes)
                     event.ignore()
-                elif not flag:
+                elif not rflag:
                     QMessageBox.warning(self,"警告","存在错误, 请检查输入的表达式!",QMessageBox.Yes)
                     event.ignore()
+                elif not eflag:
+                    QMessageBox.warning(self,"警告","请输入含有新变量的表达式!",QMessageBox.Yes)
+                    event.ignore()
                 else:
-                    if 'functionName' not in funcname:
-                        funcname = funcname[4:]
-                        funcname = funcname.split('(')[0]
-                        with open(r"./output/data.json", "w") as f:
-                            fml = '{}={}'.format(funcname, last_formular)
-                            self.todo.append([False, fml])
-                            data = json.dump(self.todo, f)
-                        event.accept()
-                        if fflag:
-                            emitformula = self.formula_filter(self.check3(last_formular,'max','min','sum','prod'))
-                        else:
-                            emitformula = self.check3(last_formular,'max','min','sum','prod')
-                        self.dockWidget.setVisible(False)
-                        self.shutdownValue.emit(((funcname, emitformula), 1))
-                        if close_flag:os.remove('run_cache')
+                    with open(r"./output/data.json", "w") as f:
+                        fml = '{}={}'.format(Funcname, last_formular)
+                        self.todo.append([False, fml])
+                        data = json.dump(self.todo, f)
+                    event.accept()
+                    if fflag:
+                        emitformula = self.formula_filter(self.check3(last_formular,'max','min','sum','prod'))
                     else:
-                        QMessageBox.warning(self,"警告","请输入含有新变量的表达式!",QMessageBox.Yes)
-                        event.ignore()
+                        emitformula = self.check3(last_formular,'max','min','sum','prod')
+                    self.dockWidget.setVisible(False)
+                    self.shutdownValue.emit(((funcname, emitformula), 1))
             else:
                 event.accept()
                 self.dockWidget.setVisible(False)
@@ -980,14 +926,10 @@ class MainDialogImgBW(QMainWindow, Ui_FormularEdit):
             vflag = False
 
     def quit(self):
-        try:
-            global sflag
-            sflag = True
-            self.close()
-            self.dockWidget.setVisible(False)
-            os.remove('run_cache')
-        except:
-            pass
+        global sflag
+        sflag = True
+        self.close()
+        self.dockWidget.setVisible(False)
         self.shutdownValue.emit(((True, False), 1))
     
     def subscript(self):
@@ -1139,10 +1081,14 @@ class MainDialogImgBW(QMainWindow, Ui_FormularEdit):
         <table>
             <tr>
                 <td>当前版本: </td>
-                <td>ver.1.1 (2023.1.9)</td>
+                <td>ver.1.2 (2023.2.8)</td>
             </tr>
             <tr>
                 <td>历史版本: </td>
+                <td>ver.1.1 (2023.1.9)</td>
+            </tr>
+            <tr>
+            <td></td>
                 <td>ver.1.0 (2022.12.18)</td>
             </tr>
             <tr>
@@ -1153,7 +1099,7 @@ class MainDialogImgBW(QMainWindow, Ui_FormularEdit):
         </font>''')
         msg.setIcon(QMessageBox.Information)
         msg.setDetailedText('''软件作者: Liskelleo; WaleYu\n联系我们: liskello_o@outlook.com;
-                 chuanqi_yu2021@126.com''')
+         chuanqi_yu2021@126.com''')
         msg.exec_()
 
     def DocHelp(self):

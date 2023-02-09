@@ -1,18 +1,15 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 import os
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, \
     QToolBar, QStatusBar, QAction, QProgressBar, QSizePolicy, \
-    QHBoxLayout, QMessageBox #QDialog
+    QHBoxLayout, QMessageBox
 from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import Qt, QSize, QUrl #pyqtSignal
+from PyQt5.QtCore import Qt, QSize, QUrl
 
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 from PyQt5.QtPrintSupport import QPrinter, QPrinterInfo, QPageSetupDialog, QPrintDialog
 
-from qt_sass_theme2.qtSassTheme import QtSassTheme
+from qt_sass_theme.qtSassTheme import QtSassTheme
 
 
 class WebView(QWebEngineView):
@@ -24,7 +21,6 @@ class WebView(QWebEngineView):
     
 
 class WebMain(QMainWindow):
-    #shutdownValue3 = pyqtSignal(bool)
     def __init__(self):
         super().__init__()
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
@@ -51,7 +47,6 @@ class WebMain(QMainWindow):
         self.setStatusBar(self.statusBar)
         self.statusBar.addPermanentWidget(self.urlprogress)
         self.statusBar.addPermanentWidget(self.progressBar)
-        #self.progressBar.hide()
 
         navigation_bar = self.addToolBar('Navigation')
         navigation_bar.setIconSize(QSize(16, 16))
@@ -115,7 +110,7 @@ class WebMain(QMainWindow):
         self.urlbar.setFont(QFont("Consolas"))
 
         t = QtSassTheme()
-        t.getThemeFiles(theme='light_gray')
+        t.getThemeFiles(theme='#ffffff')
         t.setThemeFiles(main_window=self)
 
     def showUrl(self, url):
@@ -161,7 +156,6 @@ class WebMain(QMainWindow):
             self.progressBar.setValue(0)
 
     def Changetheme(self):
-        #refer-url: https://www.fly63.com/article/detial/11062
         if self.themeflag or self.themeflag is None:
             cmd = "document.documentElement.style.filter='invert(80%) hue-rotate(180deg)'"
             self.webview.page().runJavaScript(cmd)
@@ -173,7 +167,7 @@ class WebMain(QMainWindow):
             cmd = "location.reload(true)"
             self.webview.page().runJavaScript(cmd)
             t = QtSassTheme()
-            t.getThemeFiles(theme='light_gray')
+            t.getThemeFiles(theme='#ffffff')
             t.setThemeFiles(main_window=self)
             self.themeflag = True
 
@@ -182,23 +176,19 @@ class WebMain(QMainWindow):
         self.webview.page().runJavaScript(cmd)
     
     def printRequested(self):
-        #from PyQt5.QtWidgets import QDialog
         defaultPrinter = QPrinter(QPrinterInfo.defaultPrinter())
         dialog = QPrintDialog(defaultPrinter, self)
         settingsDialog = QPageSetupDialog(defaultPrinter, self)
         if settingsDialog.exec():
             pass
-        if dialog.exec(): #QDialog.Accepted == dialog.exec():
+        if dialog.exec():
             self._printer = dialog.printer()
-            #self._printer.setColorMode(QPrinter.ColorMode.Color)
-            #self._printer.PrinterMode = QPrinter.PrinterMode.HighResolution
             self.page.print(self._printer, self.printResult)
             self.urlprogress.setText("printing...")
             self.urlprogress.show()
             self.progressBar.setMinimum(0)
             self.progressBar.setMaximum(0)
             self.progressBar.show()
-            #print(self._printer.PrinterState())
 
     def printResult(self, success):
         if self._printer.paperSource() and self._printer.printerName() != 'pdfFactory Pro':
@@ -224,20 +214,15 @@ class WebMain(QMainWindow):
             else:
                 QMessageBox.warning(self, 'Print Failed', 
                     'Printing has failed!', QMessageBox.Ok)
-                #self.printRequested()
         self.progressBar.hide()
         self.urlprogress.hide()
         self.progressBar.setMaximum(100)
         self.progressBar.setValue(0)
         del self._printer
-    
-    #def closeEvent(self, event):
-    #    self.shutdownValue3.emit(True)
 
         
 if __name__ == '__main__':
     import sys
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     app = QApplication(sys.argv)
     ex = WebMain()
     ex.show()
