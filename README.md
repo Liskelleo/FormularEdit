@@ -1,7 +1,7 @@
 # FormularEdit
 A Formula Editor Based on PyQt5. <br />
 Language Support: Chinese, English. <br />
-Libraries of Extension:by @JungGyuYoon. <br />
+Libraries of Extension:by [@JungGyuYoon](https://github.com/yjg30737). <br />
 ```
 ## 5 basic libs ##
 absresgetter
@@ -24,7 +24,7 @@ Any good suggestions, please contact me at `liskello_o@outlook.com` or `leoliske
 # 公式编辑器
 一个基于PyQt5的公式编辑器。 <br />
 语言支持：简体中文、英文。 <br />
-感谢@JungGyuYoon自建库的支持： <br />
+感谢[@JungGyuYoon](https://github.com/yjg30737)自建库的支持： <br />
 ```
 ## 5 basic libs ##
 absresgetter
@@ -39,7 +39,7 @@ qt_sass_theme
 pyqt_hidable_menubar
 pyqt_instant_search_bar
 ```
-这是打包文件的[百度网盘链接](https://pan.baidu.com/s/1g7giPjlMIgHcuYsfVHCDow)。(key: m89e) <br />
+这是打包文件的[百度网盘链接](https://pan.baidu.com/s/1g7giPjlMIgHcuYsfVHCDow)。(密钥：m89e) <br />
 **2023.11.1 更新\***：本项目现已开源，但是具有版权保护。专利登记号（中国）： 2023SR1200770。
 
 # 一份简明的公式编辑器说明书(2022.12.25 Version)
