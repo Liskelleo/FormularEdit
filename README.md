@@ -26,7 +26,7 @@ Any good suggestions, please contact me at `liskello_o@outlook.com` or `leoliske
 语言支持：简体中文、英文。 <br />
 感谢[@JungGyuYoon](https://github.com/yjg30737)自建库的支持： <br />
 ```
-## 5 basic libs ##
+## 5个基本库 ##
 absresgetter
 pyqt_svg_label
 pyqt_svg_button
@@ -34,7 +34,7 @@ pyqt_resource_helper
 pyqt_svg_abstractbutton
 ```
 ```
-## 3 applied libs ##
+## 3个应用库 ##
 qt_sass_theme
 pyqt_hidable_menubar
 pyqt_instant_search_bar
