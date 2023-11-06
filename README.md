@@ -17,7 +17,7 @@ pyqt_hidable_menubar
 pyqt_instant_search_bar
 ```
 Packed Source on [PanBaidu](https://pan.baidu.com/s/1g7giPjlMIgHcuYsfVHCDow).(key: m89e) <br />
-For instructions, please click "Document Options" in the "Help" menu bar.<br />
+For instructions, please click "Document" in the "Help" menu bar when using the software.<br />
 Any good suggestions, please contact me at `liskello_o@outlook.com` or `leoliskell@gmail.com`.<br />
 **2023.11.1 Update\***: The project is now open source, but copyrighted. Patent Registration number (in China): 2023SR1200770.
 
