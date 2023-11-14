@@ -19,7 +19,7 @@ pyqt_instant_search_bar
 Packed Source on [PanBaidu](https://pan.baidu.com/s/1g7giPjlMIgHcuYsfVHCDow).(key: m89e) <br />
 For instructions, please click "Document" in the "Help" menu bar when using the software.<br />
 Any good suggestions, please contact me at `liskello_o@outlook.com` or `leoliskell@gmail.com`.<br />
-**2023.11.1 Update\***: The project is now open source, but copyrighted. Patent Registration number (in China): 2023SR1200770.
+**2023.11.1 Update\***: The project is now open source and copyrighted. Patent Registration number (in China): 2023SR1200770.
 
 # 公式编辑器
 一个基于PyQt5的公式编辑器。 <br />
@@ -40,13 +40,13 @@ pyqt_hidable_menubar
 pyqt_instant_search_bar
 ```
 这是打包文件的[百度网盘链接](https://pan.baidu.com/s/1g7giPjlMIgHcuYsfVHCDow)。(密钥：m89e) <br />
-**2023.11.1 更新\***：本项目现已开源，但是具有版权保护。专利登记号（中国）： 2023SR1200770。
+**2023.11.1 更新\***：本项目现已开源，且具有版权保护。专利登记号：2023SR1200770。
 
 # 一份简明的公式编辑器说明书(2022.12.25 Version)
 ### 一、模块目的
 表达式将一方面在Python上可执行，另一方面可转换为LaTex代码展示
 ### 二、编辑规则
-新变量需在等式左边输入
+新变量需在等式左边输入，例如`x = f(x)`是非法的输入
 ### 三、特殊符号
 `[]` 自由下角标 例如`x[mn]`: xₘₙ （一般用于希腊字母下标，不可用于变量名） <br />
 `_` 限制下角标 例如`x_1`: x₁ （可以开启自由下角标功能，适用于全局） <br />
@@ -84,5 +84,5 @@ sum() 求和 存在问题：表达式sqrt(sum(x**2 for x in coordinates)) <br />
 Python math 模块 | [菜鸟教程](runoob.com) <br />
 Python numpy 帮助文档 | [官网](https://numpy.org/doc/)
 ### 十、联系方式
-电邮：liskello_o@outlook.com 或者leoliskell@gmail.com
+电邮：`liskello_o@outlook.com`或者`leoliskell@gmail.com`
 
