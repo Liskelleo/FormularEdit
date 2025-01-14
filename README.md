@@ -84,5 +84,5 @@ sum() 求和 存在问题：表达式sqrt(sum(x**2 for x in coordinates)) <br />
 Python math 模块 | [菜鸟教程](runoob.com) <br />
 Python numpy 帮助文档 | [官网](https://numpy.org/doc/)
 ### 十、联系方式
-电邮：`liskello_o@outlook.com`或者`leoliskell@gmail.com`
+邮件：`liskello_o@outlook.com`
 
